@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<News>> fetchNewsData() async {
     var response = await http.get(Uri.parse(
-        'https://newsapi.org/v2/everything?q=keyword&apiKey=4b397c0b925c48649a61b00c6ab69622'));
+        'https://newsapi.org/v2/everything?q=keyword&apiKey=<key dihapus>'));
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
       List<dynamic> articles = jsonData['articles'];
