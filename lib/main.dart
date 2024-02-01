@@ -4,6 +4,7 @@ import 'package:getwidget/getwidget.dart';
 import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() async{
   await Hive.initFlutter();
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -49,6 +50,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late final WebViewController controller;
   late Box _favoriteNewsBox;
   Set<int> favoriteNewsIndices = Set<int>();
   late Future<List<News>> newsData;
@@ -172,7 +174,9 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               buttonBar: GFButtonBar(children: <Widget>[
                                 GFButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+
+                                  },
                                   text: 'Read more',
                                 )
                               ]),
@@ -206,31 +210,27 @@ class _MyHomePageState extends State<MyHomePage> {
                         News news = snapshot.data![favoriteIndex];
                         return Column(
                           children: [
-                            GFCard(
-                              elevation: 5.0,
-                              // content: Image.network(news.pictURL),
-                              title: GFListTile(
-                                title:
-                                  Image.network(news.pictURL, fit: BoxFit.fill),
-
-                                subTitle: Text(
-                                  news.title,
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold),
+                            Card(
+                              child: ListTile(
+                                title: Column(
+                                  children: [
+                                    Container(
+                                        child: Text(
+                                          news.title,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 11),
+                                        ),
+                                        margin: EdgeInsets.only(left: 5,right: 5,top: 5,bottom: 5),
+                                    ),
+                                  ],
                                 ),
-                                description: Text(
-                                  news.description,
-                                  style: TextStyle(fontSize: 16),
-                                ),
+                                trailing: ElevatedButton(onPressed: (){
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => NewsWebView(url: news.url)),
+                                  );
+                                }, child: Icon(Icons.arrow_circle_right)),
                               ),
-                              buttonBar: GFButtonBar(children: <Widget>[
-                                GFButton(
-                                  onPressed: () {},
-                                  text: 'Read more',
-                                )
-                              ]),
                             ),
+
                           ],
                         );
                       },
@@ -243,6 +243,38 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class NewsWebView extends StatefulWidget {
+  final String url;
+
+  NewsWebView({required this.url});
+
+  @override
+  _NewsWebViewState createState() => _NewsWebViewState();
+}
+
+class _NewsWebViewState extends State<NewsWebView> {
+  late WebViewController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = WebViewController()
+      ..loadRequest(
+        Uri.parse(widget.url),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('News Details'),
+      ),
+      body: WebViewWidget(controller: controller)
     );
   }
 }
