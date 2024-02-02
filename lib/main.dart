@@ -175,7 +175,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               buttonBar: GFButtonBar(children: <Widget>[
                                 GFButton(
                                   onPressed: () {
-
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => NewsWebView(url: news.url)),
+                                    );
                                   },
                                   text: 'Read more',
                                 )
